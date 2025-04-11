@@ -1,0 +1,13 @@
+services:
+  camera-stream:
+    build: .
+    container_name: camera-stream
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    devices:
+      - "/dev/video0:/dev/video0"  # Pass webcam device to container
+    volumes:
+      - .:/app  # Optional: Mount current directory for development
+    environment:
+      - TZ=UTC  # Set timezone if needed

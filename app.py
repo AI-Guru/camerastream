@@ -3,6 +3,7 @@ import threading
 from flask import Flask, render_template, Response
 import socket
 import logging
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -12,8 +13,10 @@ app = Flask(__name__)
 
 # Global variables
 camera = None
-output_frame = None
+last_frame = None
 lock = threading.Lock()
+should_run = True
+fps = 30  # Frames per second for capture
 
 def get_ip_address():
     """Get the local IP address of the machine"""
@@ -37,31 +40,61 @@ def initialize_camera():
         return False
     return True
 
-def generate_frames():
-    """Generate camera frames"""
-    global output_frame, lock
+def camera_capture_loop():
+    """Continuously capture frames from the camera in a dedicated thread"""
+    global last_frame, lock, should_run
     
-    while True:
+    frame_interval = 1.0 / fps
+    
+    while should_run:
+        start_time = time.time()
+        
         if camera is None or not camera.isOpened():
-            break
+            logger.error("Camera not available")
+            time.sleep(1)
+            continue
             
         success, frame = camera.read()
         if not success:
             logger.error("Failed to capture frame from camera")
-            break
+            time.sleep(0.1)
+            continue
             
         # Convert to jpg format
         ret, buffer = cv2.imencode('.jpg', frame)
         if not ret:
             continue
             
-        # Update the output frame with lock for thread safety
+        # Update the last frame with lock for thread safety
         with lock:
-            output_frame = buffer.tobytes()
+            last_frame = buffer.tobytes()
+        
+        # Calculate sleep time to maintain desired fps
+        elapsed = time.time() - start_time
+        sleep_time = max(0, frame_interval - elapsed)
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+
+def generate_frames():
+    """Yield the latest frame to clients"""
+    global last_frame, lock
+    
+    while True:
+        # Wait until we have a frame
+        if last_frame is None:
+            time.sleep(0.1)
+            continue
+            
+        # Get the latest frame with lock for thread safety
+        with lock:
+            frame_to_yield = last_frame
             
         # Yield the frame in the format expected by Flask
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + output_frame + b'\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_to_yield + b'\r\n')
+        
+        # Small delay to control client-side framerate
+        time.sleep(0.033)  # ~30fps for clients
 
 @app.route('/')
 def index():
@@ -80,6 +113,8 @@ def start_camera_stream():
         return
         
     logger.info("Camera initialized successfully.")
+    # Start the camera capture loop in this thread
+    camera_capture_loop()
 
 if __name__ == '__main__':
     # Start camera streaming in a separate thread
