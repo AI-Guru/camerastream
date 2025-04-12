@@ -1,87 +1,22 @@
-# Camera Stream Web Application
+# Camera Stream
 
-A lightweight web application that streams video from a connected camera to web browsers. Built with Flask and OpenCV, this application enables real-time camera streaming that can be accessed from any device on your local network.
+A Flask application that streams camera images with optimized performance.
 
 ## Features
 
-- Real-time video streaming at 30 FPS
-- Accessible from any device with a web browser on the local network
-- Thread-safe implementation for optimal performance
-- Dockerized for easy deployment and cross-platform compatibility
-
-## Prerequisites
-
-- Python 3.9+ (if running without Docker)
-- Web camera (USB webcam or built-in camera)
-- Docker and Docker Compose (for containerized deployment)
-
-## Installation
-
-### Option 1: Using Docker (Recommended)
-
-1. Install Docker and Docker Compose:
-   ```
-   chmod +x installdocker.sh
-   ./installdocker.sh
-   ```
-
-2. Build and run the container:
-   ```
-   sudo docker compose up -d
-   ```
-
-3. Access the stream at `http://<your-ip-address>:5000`
-
-### Option 2: Local Installation
-
-1. Install required Python packages:
-   ```
-   pip install -r requirements.txt
-   ```
-
-2. Run the application:
-   ```
-   python app.py
-   ```
-
-3. Access the stream at `http://<your-ip-address>:5000`
+- Real-time camera streaming
+- Configurable frame rate (FPS)
+- ETag support to reduce bandwidth usage
 
 ## Configuration
 
-You can modify these settings in `app.py`:
+You can adjust the streaming frame rate by sending a POST request to the `/config` endpoint:
 
-- `fps` - Frames per second for camera capture (default: 30)
-- `port` - Web server port (default: 5000)
-
-## Project Structure
-
-```
-├── app.py                 # Main application file
-├── docker-compose.yaml    # Docker Compose configuration
-├── Dockerfile             # Docker container definition
-├── installdocker.sh       # Docker installation script
-├── requirements.txt       # Python dependencies
-└── templates/             # HTML templates for the web interface
-    └── index.html         # Main web page
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"fps": 15}' http://localhost:5000/config
 ```
 
-## Troubleshooting
+## Performance Optimization
 
-### Camera Access Issues
-
-- If running with Docker, ensure the webcam device is properly mapped in docker-compose.yaml
-- Default camera is set to index 0 (`cv2.VideoCapture(0)`). If you have multiple cameras, you may need to change this value.
-
-### Performance Optimization
-
-- If experiencing network lag, try reducing the FPS value in `app.py`
-- For low-powered devices, consider lowering the resolution in the OpenCV capture settings
-
-## License
-
-This project is open source and available under the [MIT License](https://opensource.org/licenses/MIT).
-
-## Acknowledgments
-
-- [Flask](https://flask.palletsprojects.com/)
-- [OpenCV](https://opencv.org/)
+- **FPS Control**: The stream is limited to a configurable FPS to reduce CPU usage and bandwidth
+- **ETag Implementation**: Browsers and clients that support ETags will only receive new frames when the content has changed

@@ -1,9 +1,10 @@
 import cv2
 import threading
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 import socket
 import logging
 import time
+import hashlib
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -11,12 +12,16 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
+# Configuration
+FPS = 10  # Default frames per second
+last_frame_time = 0
+last_frame = None
+last_etag = None
+
 # Global variables
 camera = None
-last_frame = None
 lock = threading.Lock()
 should_run = True
-fps = 30  # Frames per second for capture
 
 def get_ip_address():
     """Get the local IP address of the machine"""
@@ -44,11 +49,7 @@ def camera_capture_loop():
     """Continuously capture frames from the camera in a dedicated thread"""
     global last_frame, lock, should_run
     
-    frame_interval = 1.0 / fps
-    
     while should_run:
-        start_time = time.time()
-        
         if camera is None or not camera.isOpened():
             logger.error("Camera not available")
             time.sleep(1)
@@ -68,33 +69,26 @@ def camera_capture_loop():
         # Update the last frame with lock for thread safety
         with lock:
             last_frame = buffer.tobytes()
-        
-        # Calculate sleep time to maintain desired fps
-        elapsed = time.time() - start_time
-        sleep_time = max(0, frame_interval - elapsed)
-        if sleep_time > 0:
-            time.sleep(sleep_time)
 
-def generate_frames():
-    """Yield the latest frame to clients"""
-    global last_frame, lock
+def get_frame():
+    """Get the latest frame and control frame rate"""
+    global last_frame, last_frame_time, last_etag
     
-    while True:
-        # Wait until we have a frame
-        if last_frame is None:
-            time.sleep(0.1)
-            continue
-            
-        # Get the latest frame with lock for thread safety
-        with lock:
-            frame_to_yield = last_frame
-            
-        # Yield the frame in the format expected by Flask
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_to_yield + b'\r\n')
-        
-        # Small delay to control client-side framerate
-        time.sleep(0.033)  # ~30fps for clients
+    current_time = time.time()
+    if current_time - last_frame_time < 1.0/FPS:
+        return last_frame, last_etag
+    
+    # Get new frame from camera
+    with lock:
+        frame = last_frame
+    
+    # Update frame and timestamp
+    last_frame_time = current_time
+    
+    # Generate ETag for this frame
+    last_etag = hashlib.md5(frame).hexdigest()
+    
+    return frame, last_etag
 
 @app.route('/')
 def index():
@@ -103,9 +97,37 @@ def index():
 
 @app.route('/video_feed')
 def video_feed():
-    """Video streaming route"""
-    return Response(generate_frames(),
-                   mimetype='multipart/x-mixed-replace; boundary=frame')
+    """Video streaming route with ETag support"""
+    # Each client connection gets its own generator instance
+    # with its own last_sent_etag variable
+    def generate():
+        last_sent_etag = None
+        
+        while True:
+            frame, current_etag = get_frame()
+            
+            # Only send new frame if ETag changed from last sent frame
+            if current_etag != last_sent_etag:
+                yield (b'--frame\r\n'
+                      b'Content-Type: image/jpeg\r\n'
+                      b'ETag: ' + current_etag.encode() + b'\r\n\r\n' + frame + b'\r\n')
+                last_sent_etag = current_etag
+            
+            time.sleep(1.0/FPS)  # Control frame rate
+
+    return Response(generate(),
+                  mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/config', methods=['POST'])
+def update_config():
+    """Update configuration settings like FPS"""
+    global FPS
+    if 'fps' in request.json:
+        new_fps = int(request.json['fps'])
+        if 1 <= new_fps <= 30:  # Reasonable FPS range
+            FPS = new_fps
+            return {"status": "success", "fps": FPS}
+    return {"status": "error", "message": "Invalid FPS value"}, 400
 
 def start_camera_stream():
     """Start the camera stream thread"""
