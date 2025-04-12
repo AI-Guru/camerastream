@@ -39,17 +39,77 @@
             background-color: #e8f4fd;
             border-radius: 4px;
         }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        .btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Live Camera Stream</h1>
+        <h1>Dem Lil' Fuckers</h1>
         <div class="video-container">
             <img src="{{ url_for('video_feed') }}" id="videoFeed" alt="Video stream unavailable">
+        </div>
+        <div class="controls">
+            <button class="btn" id="screenshotBtn">Take Screenshot</button>
         </div>
         <div class="status">
             <p>Stream is active. Access this stream from other devices on your network.</p>
         </div>
     </div>
+
+    <script>
+        document.getElementById('screenshotBtn').addEventListener('click', function() {
+            // Create a canvas element to draw the image
+            const canvas = document.createElement('canvas');
+            const img = document.getElementById('videoFeed');
+            
+            // Make sure the image is loaded
+            if (img.complete && img.naturalHeight !== 0) {
+                // Set canvas dimensions to match the image
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                
+                // Draw the image onto the canvas
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                // Convert canvas to a data URL
+                const dataURL = canvas.toDataURL('image/jpeg');
+                
+                // Create a timestamp for the filename
+                const date = new Date();
+                const timestamp = date.toISOString().replace(/[:.]/g, '-');
+                const filename = `screenshot-${timestamp}.jpg`;
+                
+                // Create a temporary link element to trigger the download
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = filename;
+                link.click();
+            } else {
+                alert('Image not fully loaded yet. Please try again in a moment.');
+            }
+        });
+    </script>
 </body>
 </html>
