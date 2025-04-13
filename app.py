@@ -13,6 +13,11 @@ from PIL import Image
 import queue
 from concurrent.futures import ThreadPoolExecutor
 from langchain.chat_models import init_chat_model
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,16 +25,16 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Configuration (all fixed parameters)
-FPS = 10  # Frames per second
+# Configuration from environment variables
+FPS = int(os.getenv('FPS', 10))  # Frames per second
 last_frame_time = 0
 last_frame = None
 last_etag = None
 
-# Action detection configuration (all fixed parameters)
-ACTION_THRESHOLD = 5000  # Threshold for detecting motion
-MIN_ACTION_INTERVAL = 1  # Minimum interval (seconds) between action frame captures
-MAX_ACTION_INTERVAL = 60  # Maximum interval (seconds) before allowing a new action capture
+# Action detection configuration from environment variables
+ACTION_THRESHOLD = int(os.getenv('ACTION_THRESHOLD', 5000))  # Threshold for detecting motion
+MIN_ACTION_INTERVAL = int(os.getenv('MIN_ACTION_INTERVAL', 1))  # Minimum interval (seconds) between action frame captures
+MAX_ACTION_INTERVAL = int(os.getenv('MAX_ACTION_INTERVAL', 60))  # Maximum interval (seconds) before allowing a new action capture
 last_action_frame = None
 last_action_frame_etag = None
 last_action_time = 0
@@ -39,8 +44,8 @@ previous_frame_gray = None
 camera = None
 lock = threading.Lock()
 should_run = True
-detection_executor = ThreadPoolExecutor(max_workers=1)
-detection_queue = queue.Queue(maxsize=5)  # Limit queue size to prevent memory issues
+detection_executor = ThreadPoolExecutor(max_workers=int(os.getenv('DETECTION_MAX_WORKERS', 1)))
+detection_queue = queue.Queue(maxsize=int(os.getenv('DETECTION_QUEUE_SIZE', 5)))  # Limit queue size to prevent memory issues
 last_detection_result = None  # Store the latest detection result
 
 def get_ip_address():
@@ -113,15 +118,14 @@ def run_detection(frame_bytes, timestamp):
             {"role": "user", "content": user_message},
         ]
 
-        # Create the LLM.
+        # Create the LLM using environment variables
         chat_model_parameters = {}
-        chat_model_parameters["base_url"] = "hordak:11434"
-        chat_model_parameters["model_provider"] = "ollama"
-        chat_model_parameters["model"] = "gemma3:27b"
-        chat_model_parameters["temperature"] = 1.0
+        chat_model_parameters["base_url"] = os.getenv('LLM_BASE_URL', 'hordak:11434')
+        chat_model_parameters["model_provider"] = os.getenv('LLM_MODEL_PROVIDER', 'ollama') 
+        chat_model_parameters["model"] = os.getenv('LLM_MODEL', 'gemma3:27b')
+        chat_model_parameters["temperature"] = float(os.getenv('LLM_TEMPERATURE', 1.0))
         llm = init_chat_model(**chat_model_parameters)
 
-        # Run the LLM.
         response = llm.invoke(messages).content
         logger.info(f"LLM response: {response}")
         
@@ -351,9 +355,9 @@ if __name__ == '__main__':
     
     # Get the local IP address
     ip_address = get_ip_address()
-    port = 5000
+    port = int(os.getenv('PORT', 5000))
     if "dev" in sys.argv:
-        port = 5001
+        port = int(os.getenv('DEV_PORT', 5001))
 
     logger.info(f"Starting server at http://{ip_address}:{port}")
     app.run(host='0.0.0.0', port=port, debug=True, threaded=True, use_reloader=False)
