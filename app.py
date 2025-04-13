@@ -1,7 +1,7 @@
 import cv2
 import sys
 import threading
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response, request, jsonify
 import socket
 import logging
 import time
@@ -122,7 +122,7 @@ def run_detection(frame_bytes, timestamp):
         llm = init_chat_model(**chat_model_parameters)
 
         # Run the LLM.
-        response = llm.invokes(messages).content
+        response = llm.invoke(messages).content
         logger.info(f"LLM response: {response}")
         
         # Store result with timestamp and LLM response text
@@ -307,6 +307,27 @@ def action_frame():
     response = Response(frame, mimetype='image/jpeg')
     response.headers['ETag'] = etag
     return response
+
+@app.route('/get_detection_result')
+def get_detection_result():
+    """Return detection results"""
+    global last_detection_result
+    
+    with lock:
+        result = last_detection_result
+    
+    if result is None:
+        return jsonify({"error": "No detection results yet"}), 404
+    
+    # Format the timestamp for display
+    timestamp = result["timestamp"]
+    formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp))
+    
+    return jsonify({
+        "timestamp": timestamp,
+        "formatted_time": formatted_time,
+        "text": result["text"]
+    })
 
 def start_camera_stream():
     """Start the camera stream thread"""

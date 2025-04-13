@@ -69,16 +69,14 @@
     <div class="container">
         <div class="stream-container">
             <h2>Live Stream</h2>
-            <img src="{{ url_for('video_feed') }}" alt="Live Camera Stream" onerror="this.classList.add('error'); document.getElementById('live-error').style.display = 'block';">
-            <div id="live-error" class="error-message" style="display: none;">Stream not available. Please refresh the page.</div>
+            <img src="{{ url_for('video_feed') }}" alt="Live Camera Stream" onerror="this.classList.add('error');">
         </div>
         
         <div class="stream-container">
             <h2>Latest Action Frame</h2>
             <img id="action-frame" src="{{ url_for('action_frame') }}" 
-                 alt="Latest movement detection" 
-                 onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEOCAMAAADdCKVfAAAAM1BMVEX///8AAADd3d0mJiZJSUlmZmY5OTmzs7OMjIzMzMwzMzNZWVnm5uZ/f3+ZmZmysrLu7u5oDK5hAAAB8UlEQVR4nO3UiW0DMRAEQZ3k/c/rKL9vC6gK2GaG9vPbx+N8RKf8eO+z4ZAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkOf+P79dzH0y59J68gAAAABJRU5ErkJggg=='; document.getElementById('action-error').style.display = 'block';">
-            <div id="action-error" class="error-message" style="display: none;">No action detected yet</div>
+                 alt="" 
+                 onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEOCAMAAADdCKVfAAAAM1BMVEX///8AAADd3d0mJiZJSUlmZmY5OTmzs7OMjIzMzMwzMzNZWVnm5uZ/f3+ZmZmysrLu7u5oDK5hAAAB8UlEQVR4nO3UiW0DMRAEQZ3k/c/rKL9vC6gK2GaG9vPbx+N8RKf8eO+z4ZAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkOf+P79dzH0y59J68gAAAABJRU5ErkJggg==';">
         </div>
     </div>
     
@@ -95,7 +93,7 @@
             const timestamp = new Date().getTime();
             actionFrame.src = "{{ url_for('action_frame') }}?" + timestamp;
             
-            // Also check for new detection results
+            // Check for new detection results
             fetch("{{ url_for('get_detection_result') }}?" + timestamp)
                 .then(response => {
                     if (!response.ok) {
@@ -104,20 +102,26 @@
                     return response.json();
                 })
                 .then(data => {
-                    // Display detection results
-                    document.getElementById('detection-result').style.display = 'block';
-                    document.getElementById('result-timestamp').textContent = 'Detected at: ' + data.formatted_time;
-                    document.getElementById('result-text').textContent = data.text;
+                    // Only show results if there's actual data
+                    if (data && data.text && data.text.trim() !== '') {
+                        document.getElementById('detection-result').style.display = 'block';
+                        document.getElementById('result-timestamp').textContent = 'Detected at: ' + data.formatted_time;
+                        document.getElementById('result-text').textContent = data.text;
+                    } else {
+                        // Hide the results if no meaningful data
+                        document.getElementById('detection-result').style.display = 'none';
+                    }
                 })
                 .catch(error => {
+                    // Don't display any error messages in the UI
+                    document.getElementById('detection-result').style.display = 'none';
                     console.log('No detection results yet or error:', error);
                 });
         }, 5000); // Check every 5 seconds
         
-        // Monitor if live stream is working
+        // Monitor if live stream is working - without showing errors
         document.querySelector('.container img').addEventListener('load', function() {
             this.classList.remove('error');
-            document.getElementById('live-error').style.display = 'none';
         });
     </script>
 </body>
