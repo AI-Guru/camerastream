@@ -2,113 +2,78 @@
 <html>
 <head>
     <title>Camera Stream</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            text-align: center;
+            margin: 20px;
+            background-color: #f0f0f0;
         }
         h1 {
             color: #333;
+            text-align: center;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .video-container {
-            margin-top: 20px;
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
-        #videoFeed {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ddd;
-        }
-        .status {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #e8f4fd;
-            border-radius: 4px;
-        }
-        .controls {
-            margin-top: 15px;
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
         }
-        .btn {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 10px 20px;
+        .stream-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
         }
-        .btn:hover {
-            background-color: #45a049;
+        h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #444;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 4px;
+            display: block;
+        }
+        .error-message {
+            color: #c00;
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
+    <h1>Camera Stream</h1>
+    
     <div class="container">
-        <h1>Dem Lil' Fuckers</h1>
-        <div class="video-container">
-            <img src="{{ url_for('video_feed') }}" id="videoFeed" alt="Video stream unavailable">
+        <div class="stream-container">
+            <h2>Live Stream</h2>
+            <img src="{{ url_for('video_feed') }}" alt="Live Camera Stream" onerror="this.classList.add('error'); document.getElementById('live-error').style.display = 'block';">
+            <div id="live-error" class="error-message" style="display: none;">Stream not available. Please refresh the page.</div>
         </div>
-        <div class="controls">
-            <button class="btn" id="screenshotBtn">Take Screenshot</button>
-        </div>
-        <div class="status">
-            <p>Stream is active. Access this stream from other devices on your network.</p>
+        
+        <div class="stream-container">
+            <h2>Latest Action Frame</h2>
+            <img id="action-frame" src="{{ url_for('action_frame') }}" 
+                 alt="Latest movement detection" 
+                 onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEOCAMAAADdCKVfAAAAM1BMVEX///8AAADd3d0mJiZJSUlmZmY5OTmzs7OMjIzMzMwzMzNZWVnm5uZ/f3+ZmZmysrLu7u5oDK5hAAAB8UlEQVR4nO3UiW0DMRAEQZ3k/c/rKL9vC6gK2GaG9vPbx+N8RKf8eO+z4ZAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkAcPefCQBw958JAHD3nwkOf+P79dzH0y59J68gAAAABJRU5ErkJggg=='; document.getElementById('action-error').style.display = 'block';">
+            <div id="action-error" class="error-message" style="display: none;">No action detected yet</div>
         </div>
     </div>
-
+    
     <script>
-        document.getElementById('screenshotBtn').addEventListener('click', function() {
-            // Create a canvas element to draw the image
-            const canvas = document.createElement('canvas');
-            const img = document.getElementById('videoFeed');
-            
-            // Make sure the image is loaded
-            if (img.complete && img.naturalHeight !== 0) {
-                // Set canvas dimensions to match the image
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-                
-                // Draw the image onto the canvas
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                // Convert canvas to a data URL
-                const dataURL = canvas.toDataURL('image/jpeg');
-                
-                // Create a timestamp for the filename
-                const date = new Date();
-                const timestamp = date.toISOString().replace(/[:.]/g, '-');
-                const filename = `screenshot-${timestamp}.jpg`;
-                
-                // Create a temporary link element to trigger the download
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = filename;
-                link.click();
-            } else {
-                alert('Image not fully loaded yet. Please try again in a moment.');
-            }
+        // Refresh the action frame periodically
+        setInterval(function() {
+            const actionFrame = document.getElementById('action-frame');
+            const timestamp = new Date().getTime();
+            actionFrame.src = "{{ url_for('action_frame') }}?" + timestamp;
+        }, 5000); // Check every 5 seconds
+        
+        // Monitor if live stream is working
+        document.querySelector('.container img').addEventListener('load', function() {
+            this.classList.remove('error');
+            document.getElementById('live-error').style.display = 'none';
         });
     </script>
 </body>
